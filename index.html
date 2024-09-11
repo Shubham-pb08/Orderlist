@@ -59,6 +59,7 @@
                     <thead>
                         <tr>
                             <th>Item Name</th>
+                            <th class="text-center">Category</th>
                             <th class="text-center">Quantity</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -108,8 +109,62 @@
 <!-- Material Design Bootstrap JS -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
 <script>
-    // List of items
-    const items = ['Apples', 'Bananas', 'Oranges', 'Milk', 'Bread'];
+    // Inventory object with categorized items
+    const inventory = {
+        Drinks: [
+            "Pepsi Bottles",
+            "Diet Pepsi Bottles",
+            "Pepsi Zero Bottles",
+            "7UP Bottles",
+            "Ginger Ale Bottles",
+            "Root Beer Bottles",
+            "Aquafina Bottles",
+            "Clamato Juice",
+            "Apple Juice",
+            "Dole Apple Juice",
+            "Dole Orange Juice"
+        ],
+        Sauces: [
+            "Smokey BBQ Sauce",
+            "Honey Garlic Sauce",
+            "Sweet & Spicy Thai Sauce",
+            "Teriyaki Sauce",
+            "Hot Sauce",
+            "Mild Sauce",
+            "Medium Sauce",
+            "Italian Sauce",
+            "Apple Sauce",
+            "Plum Sauce",
+            "Cranberry Sauce",
+            "Worcestershire Sauce",
+            "Caramel Topping",
+            "Chocolate Topping",
+            "Plum Sauce Portions",
+            "BBQ Sauce Portions"
+        ],
+        Boxes: [
+            "Ala Carte Boxes",
+            "Entree Boxes",
+            "Ala Carte Liners",
+            "Hot Side Boxes",
+            "Side Salad Boxes (24oz)",
+            "Big Salad Boxes",
+            "32oz Bowl",
+            "12oz Bowl",
+            "8oz Cups",
+            "3.5oz Cups",
+            "2oz Cups",
+            "1oz Cups",
+            "32oz Lids",
+            "12oz/8oz Lids",
+            "3.5oz/2oz Lids",
+            "1oz Lids",
+            "Paper Bags Large",
+            "Paper Bags Medium",
+            "Paper Bags Small",
+            "Bowl Holders"
+        ]
+    };
 
     // Reference to the order and selected items table
     const orderList = document.getElementById('order-list');
@@ -120,10 +175,11 @@
     // Function to render list items with quantity controls
     function renderItems(itemsToRender) {
         orderList.innerHTML = '';
-        itemsToRender.forEach(item => {
+        itemsToRender.forEach(({ name, category }) => {
             const tableRow = document.createElement('tr');
             tableRow.innerHTML = `
-                <td>${item}</td>
+                <td>${name}</td>
+                <td class="text-center">${category}</td>
                 <td class="text-center">
                     <span class="quantity fw-bold">0</span>
                 </td>
@@ -140,7 +196,12 @@
         });
     }
 
-    renderItems(items);
+    // Flatten inventory into an array of objects with name and category
+    const allItems = Object.entries(inventory).flatMap(([category, items]) =>
+        items.map(name => ({ name, category }))
+    );
+
+    renderItems(allItems);
 
     // Function to update the selected items table
     function updateSelectedItems() {
@@ -192,6 +253,7 @@
     // Event listener for the add button
     document.getElementById('submit-btn').addEventListener('click', updateSelectedItems);
 
+    // Event listener for the copy
     // Event listener for the copy button
     document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
 
@@ -204,7 +266,7 @@
     // Event listener for the search input
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const filteredItems = items.filter(item => item.toLowerCase().includes(searchTerm));
+        const filteredItems = allItems.filter(item => item.name.toLowerCase().includes(searchTerm));
         renderItems(filteredItems);
     });
 </script>
