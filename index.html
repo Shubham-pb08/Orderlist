@@ -39,6 +39,11 @@
             vertical-align: middle;
             margin-right: 5px;
         }
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -59,7 +64,6 @@
                     <thead>
                         <tr>
                             <th>Item Name</th>
-                            <th class="text-center">Category</th>
                             <th class="text-center">Quantity</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -140,7 +144,19 @@
             "Caramel Topping",
             "Chocolate Topping",
             "Plum Sauce Portions",
-            "BBQ Sauce Portions"
+            "BBQ Sauce Portions",
+            "Coleslaw Dressing",
+            "Mayonnaise Dine In",
+            "Chalet Dressing Dine In",
+            "Mighty Caesar Dressing Portions",
+            "Chalet Dressing Portions",
+            "Italian Dressing Portions",
+            "Balsamic Dressing Portions",
+            "Sour Cream Portions",
+            "Butter Pots",
+            "Sour Cream 4L",
+            "Garlic Butter Spread",
+            "Margarine Bucket"
         ],
         Boxes: [
             "Ala Carte Boxes",
@@ -163,6 +179,74 @@
             "Paper Bags Medium",
             "Paper Bags Small",
             "Bowl Holders"
+        ],
+        Perishables: [
+            "Lettuce Romaine",
+            "Lettuce Chopped",
+            "Lettuce Leaf",
+            "Heritage Blend",
+            "Coleslaw Cabbage",
+            "Shredded Carrots",
+            "Tomatoes",
+            "Red Onions",
+            "Spring Onions",
+            "Broccoli",
+            "Cauliflower",
+            "Lemons",
+            "Cucumbers",
+            "Jumbo Fries Potatoes",
+            "Baked Potatoes"
+        ],
+        Frozen: [
+            "Ribs",
+            "Wings",
+            "Tenders",
+            "Perogies",
+            "Crispy Sandwich",
+            "Green Beans",
+            "Sweet Potato Fries",
+            "Mashed Potatoes",
+            "Pot Pie Mix",
+            "Mini Donuts",
+            "Apple Pie",
+            "Coconut Pie",
+            "Lemon Pie",
+            "Cheese Cake",
+            "Molten Lava Cake",
+            "Broccoli Soup Mix",
+            "Spring Rolls Sheets",
+            "Tortilla 12”",
+            "Ace Buns 4”",
+            "Kids Buns 3.5”",
+            "Dinner Rolls",
+            "Hoagie Rolls",
+            "White Bread",
+            "Beef Burgers",
+            "Mini Burgers",
+            "Veggie Burgers",
+            "Kids Pizza",
+            "Kids Mac and Cheese Balls",
+            "Whipped Cream",
+            "Pot Pie Lids Sheet 36 Qt."
+        ],
+        Seasonings: [
+            "Chalet Seasoning",
+            "Steak Spice Seasoning",
+            "Garlic Mesquite Seasoning",
+            "Cajun Seasoning",
+            "Cinnamon Sugar",
+            "Sprinkles",
+            "Oreo Crunch"
+        ],
+        Cook: [
+            "Chicken Totes",
+            "Chalet Seasoning Mix",
+            "Gravy Mix",
+            "Chicken Soup Mix",
+            "Rice Pilaf Seasoning",
+            "Rice",
+            "Salt",
+            "Noodles"
         ]
     };
 
@@ -175,16 +259,15 @@
     // Function to render list items with quantity controls
     function renderItems(itemsToRender) {
         orderList.innerHTML = '';
-        itemsToRender.forEach(({ name, category }) => {
+        itemsToRender.forEach(({ name }) => {
             const tableRow = document.createElement('tr');
             tableRow.innerHTML = `
                 <td>${name}</td>
-                <td class="text-center">${category}</td>
                 <td class="text-center">
                     <span class="quantity fw-bold">0</span>
                 </td>
-                <td class="text-center">
-                    <button class="btn btn-floating btn-primary decrease me-2">
+                <td class="text-center action-buttons">
+                    <button class="btn btn-floating btn-primary decrease">
                         <i class="material-icons">remove</i>
                     </button>
                     <button class="btn btn-floating btn-primary increase">
@@ -196,9 +279,10 @@
         });
     }
 
-    // Flatten inventory into an array of objects with name and category
-    const allItems = Object.entries(inventory).flatMap(([category, items]) =>
-        items.map(name => ({ name, category }))
+    // Flatten inventory into an array of objects with
+    // Flatten inventory into an array of objects with name
+    const allItems = Object.values(inventory).flatMap(items =>
+        items.map(name => ({ name }))
     );
 
     renderItems(allItems);
@@ -253,7 +337,6 @@
     // Event listener for the add button
     document.getElementById('submit-btn').addEventListener('click', updateSelectedItems);
 
-    // Event listener for the copy
     // Event listener for the copy button
     document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
 
