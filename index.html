@@ -83,6 +83,9 @@
                             </table>
                         </div>
                         <div class="modal-footer">
+                            <button id="copy-btn" class="btn btn-secondary">
+                                Copy List
+                            </button>
                             <button id="confirm-btn" class="btn btn-success">
                                 Confirm
                             </button>
@@ -166,7 +169,7 @@
                         ${category}
                     </button>
                 </h2>
-                <div id="collapse${categoryID}" class="accordion-collapse collapse" aria-labelledby="heading${categoryID}" data-mdb-parent="#itemAccordion">
+                                <div id="collapse${categoryID}" class="accordion-collapse collapse" aria-labelledby="heading${categoryID}" data-mdb-parent="#itemAccordion">
                     <div class="accordion-body">
                         <ul class="list-group">
                             ${items.map(item => `
@@ -176,7 +179,7 @@
                                         <button class="btn btn-floating btn-primary decrease me-2">
                                             <i class="material-icons">remove</i>
                                         </button>
-                                                                                <span class="quantity">0</span>
+                                        <span class="quantity">0</span>
                                         <button class="btn btn-floating btn-primary increase ms-2">
                                             <i class="material-icons">add</i>
                                         </button>
@@ -238,15 +241,44 @@
         cartModal.show();
     });
 
-    // Handle confirm button click (you can add saving to the database here)
+    // Function to copy the selected items to clipboard
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        let textToCopy = '';
+        const rows = selectedItemsTable.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const itemName = row.cells[0].textContent;
+            const quantity = row.cells[1].textContent;
+            textToCopy += `${itemName}: ${quantity}\n`;
+        });
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('List copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    });
+
+    // Handle confirm button click to save the list to localStorage
     document.getElementById('confirm-btn').addEventListener('click', () => {
-        // Implement saving to database logic here if needed
-        alert('List saved to the database!');
+        const selectedItems = [];
+
+        const rows = selectedItemsTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            const itemName = row.cells[0].textContent;
+            const quantity = parseInt(row.cells[1].textContent, 10);
+            selectedItems.push({ itemName, quantity });
+        });
+
+        // Save the selected items to localStorage
+        localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+        alert('List saved to the browser memory!');
+        
         const cartModal = mdb.Modal.getInstance(document.getElementById('cartModal'));
         cartModal.hide();
     });
 
-    // Initialize the item list
+    // Function to initialize the item list
     createItemList();
 </script>
 </body>
