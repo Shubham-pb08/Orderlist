@@ -15,6 +15,7 @@
         body {
             font-family: 'Open Sans', sans-serif;
             background-color: #f5f5f5;
+            touch-action: manipulation; /* Disable zooming on double-tap */
         }
         .card {
             border-radius: 15px;
@@ -42,6 +43,9 @@
             right: 20px;
             z-index: 1000;
         }
+        #search-box {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +54,9 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title text-center mb-4">Order</h2>
+
+            <!-- Search box for live filtering -->
+            <input type="text" id="search-box" class="form-control" placeholder="Search items...">
 
             <!-- List of items organized by categories -->
             <div class="accordion" id="itemAccordion">
@@ -101,7 +108,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
 <script>
     // Item list organized by category
-    const itemList = {
+    const itemList =  {
         "Drinks": [
             "Pepsi Bottles", "Diet pepsi Bottles", "Pepsi zero bottles", "7UP bottles", 
             "Ginger ale bottles", "Root beer bottles", "Aquafina bottles", "Clamato juice", 
@@ -157,10 +164,19 @@
     const selectedItemsTable = document.getElementById('selected-items-table').querySelector('tbody');
     const cartButton = document.getElementById('cart-btn');
 
+    // Track selected items globally to preserve state during search
+    const selectedItems = {};
+
     // Function to create the item list dynamically
-    function createItemList() {
+    function createItemList(filter = '') {
+        itemAccordion.innerHTML = ''; // Clear previous list
+
         for (const [category, items] of Object.entries(itemList)) {
             const categoryID = category.replace(/\s+/g, '');
+            const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
+
+            if (filteredItems.length === 0) continue;  // Skip categories with no matching items
+
             const accordionItem = document.createElement('div');
             accordionItem.className = 'accordion-item';
             accordionItem.innerHTML = `
@@ -169,18 +185,17 @@
                         ${category}
                     </button>
                 </h2>
-                                <div id="collapse${categoryID}" class="accordion-collapse collapse" aria-labelledby="heading${categoryID}" data-mdb-parent="#itemAccordion">
+                <div id="collapse${categoryID}" class="accordion-collapse collapse" aria-labelledby="heading${categoryID}" data-mdb-parent="#itemAccordion">
                     <div class="accordion-body">
                         <ul class="list-group">
-                            ${items.map(item => `
+                            ${filteredItems.map(item => `
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     ${item}
                                     <div class="d-flex align-items-center">
                                         <button class="btn btn-floating btn-primary decrease me-2">
                                             <i class="material-icons">remove</i>
                                         </button>
-                                       
-                                        <span class="quantity">0</span>
+                                        <span class="quantity">${selectedItems[item] || 0}</span>
                                         <button class="btn btn-floating btn-primary increase ms-2">
                                             <i class="material-icons">add</i>
                                         </button>
@@ -195,32 +210,11 @@
         }
     }
 
-    // Function to handle the quantity increment and decrement
-    function setupQuantityHandlers() {
-        document.querySelectorAll('.increase').forEach(button => {
-            button.addEventListener('click', function() {
-                const quantityElement = this.previousElementSibling;
-                quantityElement.textContent = parseInt(quantityElement.textContent) + 1;
-            });
-        });
+    // Function to update the cart modal with selected items
+    function updateSelectedItems() {
+        selectedItemsTable.innerHTML = ''; // Clear existing items
 
-        document.querySelectorAll('.decrease').forEach(button => {
-            button.addEventListener('click', function() {
-                const quantityElement = this.nextElementSibling;
-                const currentQuantity = parseInt(quantityElement.textContent);
-                if (currentQuantity > 0) {
-                    quantityElement.textContent = currentQuantity - 1;
-                }
-            });
-        });
-    }
-
-    // Function to populate the selected items table in the modal
-    function populateSelectedItemsTable() {
-        selectedItemsTable.innerHTML = ''; // Clear existing rows
-        document.querySelectorAll('.list-group-item').forEach(item => {
-            const itemName = item.firstChild.textContent.trim();
-            const quantity = parseInt(item.querySelector('.quantity').textContent);
+        for (const [itemName, quantity] of Object.entries(selectedItems)) {
             if (quantity > 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -229,52 +223,82 @@
                 `;
                 selectedItemsTable.appendChild(row);
             }
-        });
+        }
     }
 
-    // Function to copy selected items to clipboard
-    function copySelectedItems() {
-        const selectedItems = [];
-        selectedItemsTable.querySelectorAll('tr').forEach(row => {
-            const itemName = row.querySelector('td:first-child').textContent;
-            const quantity = row.querySelector('td:nth-child(2)').textContent;
-            selectedItems.push(`${itemName} (${quantity})`);
-        });
-        const textToCopy = selectedItems.join('\n');
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('Copied to clipboard!');
-        }).catch(err => {
-            console.error('Error copying text: ', err);
-        });
+    // Function to handle quantity changes
+    function updateQuantity(button, change) {
+        const itemElement = button.closest('.list-group-item');
+        const itemName = itemElement.childNodes[0].textContent.trim();
+        const quantitySpan = button.closest('.d-flex').querySelector('.quantity');
+        let quantity = parseInt(quantitySpan.textContent, 10) + change;
+
+        if (quantity < 0) quantity = 0;
+        quantitySpan.textContent = quantity;
+
+        // Update selected items list
+        selectedItems[itemName] = quantity;
+
+        // Automatically update the cart if an item quantity is changed
+        updateSelectedItems();
     }
 
-    // Function to clear selected items after confirmation
-    function clearSelectedItems() {
-        document.querySelectorAll('.quantity').forEach(quantityElement => {
-            quantityElement.textContent = '0'; // Reset quantity to 0
-        });
-        selectedItemsTable.innerHTML = ''; // Clear modal table
-    }
+    // Event listener to handle increase/decrease buttons
+    itemAccordion.addEventListener('click', (e) => {
+        if (e.target.closest('.increase')) {
+            updateQuantity(e.target.closest('.increase'), 1);
+        } else if (e.target.closest('.decrease')) {
+            updateQuantity(e.target.closest('.decrease'), -1);
+        }
+    });
 
-    // Setup event listeners
-    document.getElementById('cart-btn').addEventListener('click', function() {
-        populateSelectedItemsTable();
+    // Show the cart modal when the cart button is clicked
+    cartButton.addEventListener('click', () => {
+        updateSelectedItems();
         const cartModal = new mdb.Modal(document.getElementById('cartModal'));
         cartModal.show();
     });
 
-    document.getElementById('copy-btn').addEventListener('click', function() {
-        copySelectedItems();
+    // Search functionality: filter items as you type
+    document.getElementById('search-box').addEventListener('input', function () {
+        const searchTerm = this.value;
+        createItemList(searchTerm);  // Recreate the item list based on search
     });
 
-    document.getElementById('confirm-btn').addEventListener('click', function() {
-        alert('Items confirmed!');
-        clearSelectedItems(); // Clear items after confirmation
+    // Confirm button: Clear all selected items after confirming
+    document.getElementById('confirm-btn').addEventListener('click', function () {
+        Object.keys(selectedItems).forEach(item => {
+            selectedItems[item] = 0;  // Reset all selected items
+        });
+        selectedItemsTable.innerHTML = '';  // Clear the cart table
+
+        document.querySelectorAll('.list-group-item .quantity').forEach(quantityElement => {
+            quantityElement.textContent = '0';  // Reset quantities in the list
+        });
+
+        const cartModal = mdb.Modal.getInstance(document.getElementById('cartModal'));
+        cartModal.hide();  // Close the cart modal
     });
 
-    // Initialize item list and quantity handlers
+    // Copy the selected items to clipboard
+    document.getElementById('copy-btn').addEventListener('click', function () {
+        const selectedItemsText = Array.from(selectedItemsTable.querySelectorAll('tr'))
+            .map(row => `${row.cells[0].textContent.trim()}: ${row.cells[1].textContent.trim()}`)
+            .join('\n');
+        navigator.clipboard.writeText(selectedItemsText)
+            .then(() => {
+                alert('Items copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Error copying to clipboard:', err);
+            });
+    });
+
+    // Initialize the item list on page load
     createItemList();
-    setupQuantityHandlers();
 </script>
+
 </body>
 </html>
+
+                                                            
