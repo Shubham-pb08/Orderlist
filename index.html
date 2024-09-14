@@ -179,6 +179,7 @@
                                         <button class="btn btn-floating btn-primary decrease me-2">
                                             <i class="material-icons">remove</i>
                                         </button>
+                                       
                                         <span class="quantity">0</span>
                                         <button class="btn btn-floating btn-primary increase ms-2">
                                             <i class="material-icons">add</i>
@@ -194,15 +195,32 @@
         }
     }
 
-    // Function to update the cart modal with selected items
-    function updateSelectedItems() {
-        selectedItemsTable.innerHTML = ''; // Clear existing items
-        const selectedItems = document.querySelectorAll('.list-group-item');
+    // Function to handle the quantity increment and decrement
+    function setupQuantityHandlers() {
+        document.querySelectorAll('.increase').forEach(button => {
+            button.addEventListener('click', function() {
+                const quantityElement = this.previousElementSibling;
+                quantityElement.textContent = parseInt(quantityElement.textContent) + 1;
+            });
+        });
 
-        selectedItems.forEach(item => {
-            const itemName = item.childNodes[0].textContent.trim();
-            const quantity = parseInt(item.querySelector('.quantity').textContent, 10);
+        document.querySelectorAll('.decrease').forEach(button => {
+            button.addEventListener('click', function() {
+                const quantityElement = this.nextElementSibling;
+                const currentQuantity = parseInt(quantityElement.textContent);
+                if (currentQuantity > 0) {
+                    quantityElement.textContent = currentQuantity - 1;
+                }
+            });
+        });
+    }
 
+    // Function to populate the selected items table in the modal
+    function populateSelectedItemsTable() {
+        selectedItemsTable.innerHTML = ''; // Clear existing rows
+        document.querySelectorAll('.list-group-item').forEach(item => {
+            const itemName = item.firstChild.textContent.trim();
+            const quantity = parseInt(item.querySelector('.quantity').textContent);
             if (quantity > 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -214,73 +232,49 @@
         });
     }
 
-    // Function to handle quantity changes
-    function updateQuantity(button, change) {
-        const quantitySpan = button.closest('.d-flex').querySelector('.quantity');
-        let quantity = parseInt(quantitySpan.textContent, 10) + change;
-        if (quantity < 0) quantity = 0;
-        quantitySpan.textContent = quantity;
-
-        // Automatically update the cart if an item quantity is changed
-        updateSelectedItems();
+    // Function to copy selected items to clipboard
+    function copySelectedItems() {
+        const selectedItems = [];
+        selectedItemsTable.querySelectorAll('tr').forEach(row => {
+            const itemName = row.querySelector('td:first-child').textContent;
+            const quantity = row.querySelector('td:nth-child(2)').textContent;
+            selectedItems.push(`${itemName} (${quantity})`);
+        });
+        const textToCopy = selectedItems.join('\n');
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Copied to clipboard!');
+        }).catch(err => {
+            console.error('Error copying text: ', err);
+        });
     }
 
-    // Event listener to handle increase/decrease buttons
-    itemAccordion.addEventListener('click', (e) => {
-        if (e.target.closest('.increase')) {
-            updateQuantity(e.target.closest('.increase'), 1);
-        } else if (e.target.closest('.decrease')) {
-            updateQuantity(e.target.closest('.decrease'), -1);
-        }
-    });
+    // Function to clear selected items after confirmation
+    function clearSelectedItems() {
+        document.querySelectorAll('.quantity').forEach(quantityElement => {
+            quantityElement.textContent = '0'; // Reset quantity to 0
+        });
+        selectedItemsTable.innerHTML = ''; // Clear modal table
+    }
 
-    // Show the cart modal when the cart button is clicked
-    cartButton.addEventListener('click', () => {
-        updateSelectedItems();
+    // Setup event listeners
+    document.getElementById('cart-btn').addEventListener('click', function() {
+        populateSelectedItemsTable();
         const cartModal = new mdb.Modal(document.getElementById('cartModal'));
         cartModal.show();
     });
 
-    // Function to copy the selected items to clipboard
-    document.getElementById('copy-btn').addEventListener('click', () => {
-        let textToCopy = '';
-        const rows = selectedItemsTable.querySelectorAll('tr');
-
-        rows.forEach(row => {
-            const itemName = row.cells[0].textContent;
-            const quantity = row.cells[1].textContent;
-            textToCopy += `${itemName}: ${quantity}\n`;
-        });
-
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('List copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-        });
+    document.getElementById('copy-btn').addEventListener('click', function() {
+        copySelectedItems();
     });
 
-    // Handle confirm button click to save the list to localStorage
-    document.getElementById('confirm-btn').addEventListener('click', () => {
-        const selectedItems = [];
-
-        const rows = selectedItemsTable.querySelectorAll('tr');
-        rows.forEach(row => {
-            const itemName = row.cells[0].textContent;
-            const quantity = parseInt(row.cells[1].textContent, 10);
-            selectedItems.push({ itemName, quantity });
-        });
-
-        // Save the selected items to localStorage
-        localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
-        alert('List saved to the browser memory!');
-        
-        const cartModal = mdb.Modal.getInstance(document.getElementById('cartModal'));
-        cartModal.hide();
+    document.getElementById('confirm-btn').addEventListener('click', function() {
+        alert('Items confirmed!');
+        clearSelectedItems(); // Clear items after confirmation
     });
 
-    // Function to initialize the item list
+    // Initialize item list and quantity handlers
     createItemList();
+    setupQuantityHandlers();
 </script>
 </body>
 </html>
-
