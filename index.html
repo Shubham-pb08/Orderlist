@@ -106,59 +106,9 @@
 
 <!-- Material Design Bootstrap JS -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+<!-- Import external itemList from data.js -->
+<script type="text/javascript" src="data.js"></script>
 <script>
-    // Item list organized by category
-    const itemList =  {
-        "Drinks": [
-            "Pepsi Bottles", "Diet pepsi Bottles", "Pepsi zero bottles", "7UP bottles", 
-            "Ginger ale bottles", "Root beer bottles", "Aquafina bottles", "Clamato juice", 
-            "Apple juice", "Dole apple juice", "Dole orange juice", "Kids Apple juice"
-        ],
-        "Sauces": [
-            "Smokey BBQ sauce", "Honey garlic sauce", "Sweet & spicy thai sauce", "Teriyaki sauce",
-            "Hot sauce", "Mild sauce", "Medium sauce", "Italian sauce", "Apple sauce", "Plum sauce",
-            "Cranberry sauce", "Worcestershire sauce", "Ketchup bottles", "Ketchup portions", 
-            "Caramel topping", "Chocolate topping", "Plum sauce portions", "BBQ sauce portions", 
-            "Coleslaw dressing", "Mayonnaise dine in", "Chalet dressing dine in", "Mighty caesar dressing portions",
-            "Chalet dressing portions", "Italian dressing portions", "Balsamic dressing portions", 
-            "Sour cream portions", "Butter pots", "Sour cream 4L", "Garlic butter spread", "Margarine bucket"
-        ],
-        "Boxes": [
-            "Ala carte boxes", "Entree boxes", "Ala carte liners", "Hot side boxes", "Side salad boxes (24oz)", 
-            "Big salad boxes", "32oz bowl", "12oz bowl", "8oz cups", "3.5oz cups", "2oz cups", 
-            "1oz cups", "32oz lids", "12oz/8oz lids", "3.5oz/2oz lids", "1oz lids", "Paper bags large", 
-            "Paper bags medium", "Paper bags small", "Bowl holders", "3 in 1 cutlery set", "Soup spoons", 
-            "Kids cups", "Kids cups lids", "Straws", "Pot pie containers"
-        ],
-        "Perishables": [
-            "Lettuce romaine", "Lettuce chopped", "Lettuce leaf", "Heritage blend", "Coleslaw cabbage", 
-            "Shredded carrots", "Tomatoes", "Red onions", "Spring onions", "Broccoli", "Cauliflower", 
-            "Lemons", "Cucumbers", "Jumbo fries potatoes", "Baked potatoes"
-        ],
-        "Frozen": [
-            "Ribs", "Wings", "Tenders", "Perogies", "Crispy sandwich", "Green beans", 
-            "Sweet potato fries", "Mashed potatoes", "Pot pie mix", "Mini donuts", "Apple pie", 
-            "Coconut pie", "Lemon pie", "Cheese cake", "Molten lava cake", "Broccoli soup mix", 
-            "Spring rolls sheets", "Tortilla 12”", "Ace buns 4”", "Kids buns 3.5”", "Dinner rolls", 
-            "Hoagie rolls", "White bread", "Beef burgers", "Mini burgers", "Veggie burgers", 
-            "Kids pizza", "Kids mac and cheese balls", "Whipped cream", "Pot pie lids sheet 36 Qt."
-        ],
-        "Seasonings": [
-            "Chalet seasoning", "Steak spice seasoning", "Garlic Mesquite seasoning", "Cajun seasoning", 
-            "Cinnamon sugar", "Sprinkles", "Oreo crunch", "Salt portions", "Pepper portions", 
-            "Greek seasoning", "Pepper jar"
-        ],
-        "Cook": [
-            "Chicken totes", "Chalet seasoning mix", "Gravy mix", "Chicken soup mix", "Rice pilaf seasoning", 
-            "Rice", "Salt", "Noodles"
-        ],
-        "Other": [
-            "Tea bags", "Coffee", "Decaf coffee", "Cotton candy", "Milkkettes", "Creamers", 
-            "Milk", "Chocolate milk", "Sugar", "Sweetener", "Crackers", "Croutons", "M & Ms", 
-            "Kids toys", "Napkins", "Swiss chalet napkins"
-        ]
-    };
-
     // Reference to the item accordion and selected items table
     const itemAccordion = document.getElementById('itemAccordion');
     const selectedItemsTable = document.getElementById('selected-items-table').querySelector('tbody');
@@ -260,45 +210,42 @@
     });
 
     // Search functionality: filter items as you type
-    document.getElementById('search-box').addEventListener('input', function () {
-        const searchTerm = this.value;
-        createItemList(searchTerm);  // Recreate the item list based on search
+       document.getElementById('search-box').addEventListener('input', (e) => {
+        const searchQuery = e.target.value.trim();
+        createItemList(searchQuery);  // Recreate the item list based on the search query
     });
 
-    // Confirm button: Clear all selected items after confirming
-    document.getElementById('confirm-btn').addEventListener('click', function () {
-        Object.keys(selectedItems).forEach(item => {
-            selectedItems[item] = 0;  // Reset all selected items
-        });
-        selectedItemsTable.innerHTML = '';  // Clear the cart table
+    // Copy list functionality: copies selected items to clipboard
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        let copyText = '';
+        for (const [itemName, quantity] of Object.entries(selectedItems)) {
+            if (quantity > 0) {
+                copyText += `${itemName} - ${quantity}\n`;
+            }
+        }
 
-        document.querySelectorAll('.list-group-item .quantity').forEach(quantityElement => {
-            quantityElement.textContent = '0';  // Reset quantities in the list
-        });
-
-        const cartModal = mdb.Modal.getInstance(document.getElementById('cartModal'));
-        cartModal.hide();  // Close the cart modal
-    });
-
-    // Copy the selected items to clipboard
-    document.getElementById('copy-btn').addEventListener('click', function () {
-        const selectedItemsText = Array.from(selectedItemsTable.querySelectorAll('tr'))
-            .map(row => `${row.cells[0].textContent.trim()}: ${row.cells[1].textContent.trim()}`)
-            .join('\n');
-        navigator.clipboard.writeText(selectedItemsText)
+        // Use the Clipboard API to copy text
+        navigator.clipboard.writeText(copyText)
             .then(() => {
-                alert('Items copied to clipboard!');
+                alert('Copied to clipboard!');
             })
-            .catch(err => {
-                console.error('Error copying to clipboard:', err);
+            .catch((err) => {
+                console.error('Could not copy text: ', err);
             });
     });
 
-    // Initialize the item list on page load
+    // Confirm button functionality: triggers a confirmation alert
+    document.getElementById('confirm-btn').addEventListener('click', () => {
+        if (Object.values(selectedItems).some(quantity => quantity > 0)) {
+            alert('Order confirmed!');
+        } else {
+            alert('No items selected.');
+        }
+    });
+
+    // Initially create the full item list without filters
     createItemList();
 </script>
-
 </body>
 </html>
 
-                                                            
