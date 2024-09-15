@@ -2,14 +2,14 @@ const itemList = {
         "Drinks": [
             "Pepsi Bottles", "Diet pepsi Bottles", "Pepsi zero bottles", "7UP bottles", 
             "Ginger ale bottles", "Root beer bottles", "Aquafina bottles", "Clamato juice", 
-            "Apple juice Dine In", "Dole apple juice", "Dole orange juice", "Kids Apple juice"
+            "Apple juice Dine In", "Dole apple juice", "Dole orange juice", "Kids Apple juice", "Grenadine syrup"
         ],
         "Sauces": [
             "Smokey BBQ sauce", "Honey garlic sauce", "Sweet & spicy thai sauce", "Teriyaki sauce",
             "Hot sauce", "Mild sauce", "Medium sauce", "Italian sauce", "Apple sauce", "Plum sauce",
             "Cranberry sauce", "Worcestershire sauce", "Ketchup bottles", "Ketchup portions", 
             "Caramel topping", "Chocolate topping", "Plum sauce portions", "BBQ sauce portions", 
-            "Coleslaw dressing", "Mayonnaise dine in", "Chalet dressing dine in", "Mighty caesar dressing portions",
+            "Coleslaw dressing", "Mayonnaise dine in", "Mayonnaise portions", "Chalet dressing dine in", "Mighty caesar dressing portions",
             "Chalet dressing portions", "Italian dressing portions", "Balsamic dressing portions", 
             "Sour cream portions", "Butter pots", "Sour cream 4L", "Garlic butter spread", "Margarine bucket"
         ],
@@ -43,8 +43,8 @@ const itemList = {
             "Rice", "Salt", "Noodles"
         ],
         "Other": [
-            "Tea bags", "Coffee", "Decaf coffee", "Cotton candy", "Milkkettes", "Creamers", 
-            "Milk", "Chocolate milk", "Sugar", "Sweetener", "Crackers", "Croutons", "M & Ms", 
+            "Tea bags", "Coffee", "Decaf coffee", "Cotton candy", "Oreo Crunch", "Milkkettes", "Creamers", 
+            "Milk", "Chocolate milk", "Sugar", "Salt portions", "Pepper portions", "Sweetener", "Crackers", "Croutons", "M & Ms", 
             "Kids toys", "Napkins", "Swiss chalet napkins"
         ]
     };
