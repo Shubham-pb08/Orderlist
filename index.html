@@ -106,8 +106,8 @@
 
 <!-- Material Design Bootstrap JS -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
-<!-- Import external itemList from data.js -->
-<script type="text/javascript" src="data.js"></script>
+<!-- External item list from data.js -->
+<script src="data.js"></script>
 <script>
     // Reference to the item accordion and selected items table
     const itemAccordion = document.getElementById('itemAccordion');
@@ -210,42 +210,62 @@
     });
 
     // Search functionality: filter items as you type
-       document.getElementById('search-box').addEventListener('input', (e) => {
-        const searchQuery = e.target.value.trim();
-        createItemList(searchQuery);  // Recreate the item list based on the search query
+    document.getElementById('search-box').addEventListener('input', function () {
+        const searchTerm = this.value;
+        createItemList(searchTerm);  // Recreate the item list based on search
     });
 
-    // Copy list functionality: copies selected items to clipboard
+    // Confirm button functionality: clears selected items and closes the modal
+    document.getElementById('confirm-btn').addEventListener('click', () => {
+        // Check if any items are selected
+        if (Object.values(selectedItems).some(quantity => quantity > 0)) {
+            // Clear all selected items
+            Object.keys(selectedItems).forEach(item => {
+                selectedItems[item] = 0;  // Reset quantity of each item
+            });
+
+            // Clear the cart display
+            selectedItemsTable.innerHTML = '';  // Empty the table in the cart modal
+
+            // Update the displayed quantities in the main list to 0
+            document.querySelectorAll('.list-group-item .quantity').forEach(quantityElement => {
+                quantityElement.textContent = '0';  // Reset quantities in the list
+            });
+
+            // Close the modal
+            const cartModal = mdb.Modal.getInstance(document.getElementById('cartModal'));
+            cartModal.hide();
+
+            alert('Order confirmed and cart cleared!');
+        } else {
+            alert('No items selected to confirm!');
+        }
+    });
+
+    // Copy button functionality: copies the selected items and their quantities to the clipboard
     document.getElementById('copy-btn').addEventListener('click', () => {
         let copyText = '';
         for (const [itemName, quantity] of Object.entries(selectedItems)) {
             if (quantity > 0) {
-                copyText += `${itemName} - ${quantity}\n`;
+                copyText += `${itemName}: ${quantity}\n`;
             }
         }
 
-        // Use the Clipboard API to copy text
-        navigator.clipboard.writeText(copyText)
-            .then(() => {
-                alert('Copied to clipboard!');
-            })
-            .catch((err) => {
-                console.error('Could not copy text: ', err);
+        if (copyText) {
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert('Selected items copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy text to clipboard.');
             });
-    });
-
-    // Confirm button functionality: triggers a confirmation alert
-    document.getElementById('confirm-btn').addEventListener('click', () => {
-        if (Object.values(selectedItems).some(quantity => quantity > 0)) {
-            alert('Order confirmed!');
         } else {
-            alert('No items selected.');
+            alert('No items to copy.');
         }
     });
 
-    // Initially create the full item list without filters
+    // Initial call to create the item list on page load
     createItemList();
 </script>
 </body>
 </html>
+
 
