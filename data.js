@@ -167,5 +167,22 @@ const itemList = {
             "Kids toys",
             "Napkins",
             "Swiss chalet napkins"
+        ],
+        "Chemicals & Sanitary": [
+                "Degreaser",
+                "Dishwasher Soap",
+                "Sanitizer",
+                "Frypot Boil out Solution",
+                "Handwashing Soap",
+                "Hand Sanitizer",
+                "Dual Action Mop Liquid",
+                "garbage bags large",
+                "garbage bags small",
+                "paper towels",
+                "toilet rolls",
+                "Mop head Red",
+                "Mop head Green",
+                "Combitherm",
+                "Ecoshine"
         ]
     };
