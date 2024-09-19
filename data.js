@@ -147,6 +147,27 @@ const itemList = {
             "Salt", 
             "Noodles"
         ],
+        "Chemicals": [
+            "Tea bags", 
+            "Coffee", 
+            "Decaf coffee",
+            "Cotton candy",
+            "Oreo Crunch",
+            "Milkkettes", 
+            "Creamers", 
+            "Milk",
+            "Chocolate milk", 
+            "Sugar",
+            "Salt portions",
+            "Pepper portions", 
+            "Sweetener", 
+            "Crackers", 
+            "Croutons", 
+            "M & Ms", 
+            "Kids toys",
+            "Napkins",
+            "Swiss chalet napkins"
+        ],
         "Other": [
             "Tea bags", 
             "Coffee", 
