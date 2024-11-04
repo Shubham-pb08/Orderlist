@@ -23,6 +23,7 @@ const itemList = {
             "CAN Bubly Cherry",
             "CAN Bubly Blackberry",
             "CAN Shweppes Tonic Water",
+            "CAN Montellier",
             "Clamato juice", 
             "Apple juice [Dine In]", 
             "Orange juice [Dine In]", 
@@ -30,7 +31,8 @@ const itemList = {
             "Dole apple juice", 
             "Dole orange juice", 
             "Kids Apple juice", 
-            "Grenadine syrup"
+            "Grenadine syrup",
+            "Pure Leaf Iced tea",
         ],
         "Sauces": [
             "Smokey BBQ sauce",
@@ -66,6 +68,7 @@ const itemList = {
             "Garlic butter spread", 
             "Margarine bucket",
             "Pickle Bucket",
+            "Relish",
         ],
         "Boxes": [
             "Ala carte boxes", 
@@ -138,7 +141,6 @@ const itemList = {
             "Lemon pie", 
             "Cheese cake", 
             "Molten lava cake", 
-            "Broccoli soup mix", 
             "Spring rolls sheets",
             "Tortilla 12”", 
             "Ace buns 4”",
@@ -152,7 +154,9 @@ const itemList = {
             "Kids pizza", 
             "Kids mac and cheese balls", 
             "Whipped cream", 
-            "Pot pie lids sheet 36 Qt."
+            "Pot pie lids sheet 36 Qt.",
+            "Bacon Chips",
+            "Bacon Strips",
         ],
         "Seasonings": [
             "Chalet seasoning",
@@ -175,11 +179,12 @@ const itemList = {
             "Rice pilaf seasoning", 
             "Rice", 
             "Salt", 
-            "Kids Noodles"
+            "Kids Noodles",
+            "Broccoli Soup",
         ],
         "Chemicals": [
                 "Degreaser",
-                "Dishwasher Soap All purpose",
+                "dishwasher Liquid: Ultra 5 Gallon",
                 "Sanitizer",
                 "Fryer cleaner Chemical",
                 "Handwashing Soap",
